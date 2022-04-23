@@ -22,3 +22,6 @@ jobs:
       - uses: ./
         with:
           milliseconds: 1000
+          version: v0.31.0
+      - name: Echo Version
+        run: echo ${{input.version}}

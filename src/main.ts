@@ -1,19 +1,63 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as semver from 'semver';
+import * as github from '@actions/github';
 
-async function run(): Promise<void> {
+
+async function getVersion(): Promise<string> {
+  const version = core.getInput('version');
+  if (version === 'latest' || version === 'edge') {
+    return version;
+  }
+
+  if (semver.valid(version)) {
+    return semver.clean(version) || version;
+  }
+
+  if (semver.validRange(version)) {
+    const max = semver.maxSatisfying(await getAllVersions(), version);
+    if (max) {
+      return semver.clean(max) || version;
+    }
+    core.warning(`${version} did not match any release version.`);
+  } else {
+    core.warning(`${version} is not a valid version or range.`);
+  }
+  return version;
+}
+
+async function getAllVersions(): Promise<string[]> {
+  const githubToken = core.getInput('github-token', { required: true });
+  const octokit = github.getOctokit(githubToken);
+
+  const allVersions: string[] = [];
+  for await (const response of octokit.paginate.iterator(
+    octokit.rest.repos.listReleases,
+    { owner: 'open-policy-agent', repo: 'conftest' }
+  )) {
+    for (const release of response.data) {
+      if (release.name) {
+        allVersions.push(release.name);
+      }
+    }
+  }
+
+  return allVersions;
+}
+
+
+
+async function setup(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    // Get version of tool to be installed
+    const version = await getVersion();
+    core.info(`Setup Conftest version ${version}`);
+    // Download the specific version of the tool, e.g. as a tarball/zipball
+  } catch (e) {
+    core.setFailed(e as string | Error);
   }
 }
 
-run()
+if (require.main === module) {
+  // eslint-disable-next-line no-void
+  void setup();
+}
