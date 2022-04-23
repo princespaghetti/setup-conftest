@@ -70,15 +70,19 @@ function getDownloadObject(version) {
     const platform = os.platform();
     const filename = `conftest_${version}_${mapOS(platform)}_${mapArch(os.arch())}`;
     let url;
+    let binaryName;
     if (process.platform === 'win32') {
         url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.zip`;
+        binaryName = `conftest.exe`;
     }
     else {
         url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.tar.gz`;
+        binaryName = `conftest`;
     }
     core.info(`Fetch url: ${url}`);
     return {
-        url
+        url,
+        binaryName
     };
 }
 function getVersion() {
@@ -146,8 +150,7 @@ function setup() {
                 yield tc.extractTar(downloadPath, pathToCLI);
             }
             // Make the downloaded file executable
-            const binaryName = os.platform() === 'win32' ? `conftest.exe` : `conftest`;
-            fs.chmodSync(path.join(pathToCLI, binaryName), '755');
+            fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
             // Expose the tool by adding it to the PATH
             core.addPath(pathToCLI);
         }
