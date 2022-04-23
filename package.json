@@ -22,7 +22,7 @@
     "node",
     "setup"
   ],
-  "author": "",
+  "author": "princespaghetti",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.6.0",
