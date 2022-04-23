@@ -68,7 +68,7 @@ function mapOS(opsys) {
 function getDownloadObject(version) {
     const vsn = `v${version}`;
     const platform = os.platform();
-    const filename = `opa_${mapOS(platform)}_${mapArch(os.arch())}`;
+    const filename = `conftest_${mapOS(platform)}_${mapArch(os.arch())}`;
     const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
     const url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
     core.info(`Fetch url: ${url}`);
