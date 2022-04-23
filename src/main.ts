@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import * as fs from 'fs';
 import * as github from '@actions/github';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
 import * as semver from 'semver';
 import * as tc from '@actions/tool-cache';
 
@@ -26,7 +26,7 @@ function mapOS(opsys: string): string {
 
 function getDownloadObject(version: string): {
   url: string;
-  binaryName: string;
+  releaseName: string;
 } {
   const vsn = `v${version}`;
 
@@ -34,11 +34,21 @@ function getDownloadObject(version: string): {
   const filename = `conftest_${mapOS(platform)}_${mapArch(os.arch())}`;
   const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
 
-  const url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
+  let releaseName: string; 
+  let url: string;
+
+  if (process.platform === 'win32') {
+    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.zip`;
+    releaseName = `${binaryName}.zip`;
+  } else {
+    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.tar.gz`;
+    releaseName = releaseName = `${binaryName}.tar.gz`;
+  }
+
   core.info(`Fetch url: ${url}`);
   return {
     url,
-    binaryName,
+    releaseName,
   };
 }
 
@@ -94,13 +104,15 @@ async function setup(): Promise<void> {
     // Download the specific version of the tool, e.g. as a tarball/zipball
     const download = getDownloadObject(version);
     const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
-    await tc.downloadTool(
-      download.url,
-      path.join(pathToCLI, download.binaryName)
-    );
-
+    const downloadPath = await tc.downloadTool(download.url);
+    let downloadExtractedFolder: string;
+    if (process.platform === 'win32') {
+      downloadExtractedFolder = await tc.extractZip(downloadPath, pathToCLI);
+    } else {
+      downloadExtractedFolder = await tc.extractTar(downloadPath, pathToCLI);
+    }
     // Make the downloaded file executable
-    fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
+    fs.chmodSync(path.join(pathToCLI, "conftest"), '755');
 
     // Expose the tool by adding it to the PATH
     core.addPath(pathToCLI);

@@ -45,8 +45,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(5747));
 const github = __importStar(__nccwpck_require__(5438));
-const path = __importStar(__nccwpck_require__(5622));
 const os = __importStar(__nccwpck_require__(2087));
+const path = __importStar(__nccwpck_require__(5622));
 const semver = __importStar(__nccwpck_require__(1383));
 const tc = __importStar(__nccwpck_require__(7784));
 // arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
@@ -70,11 +70,20 @@ function getDownloadObject(version) {
     const platform = os.platform();
     const filename = `conftest_${mapOS(platform)}_${mapArch(os.arch())}`;
     const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
-    const url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
+    let releaseName;
+    let url;
+    if (process.platform === 'win32') {
+        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.zip`;
+        releaseName = `${binaryName}.zip`;
+    }
+    else {
+        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.tar.gz`;
+        releaseName = releaseName = `${binaryName}.tar.gz`;
+    }
     core.info(`Fetch url: ${url}`);
     return {
         url,
-        binaryName,
+        releaseName,
     };
 }
 function getVersion() {
@@ -134,9 +143,16 @@ function setup() {
             // Download the specific version of the tool, e.g. as a tarball/zipball
             const download = getDownloadObject(version);
             const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
-            yield tc.downloadTool(download.url, path.join(pathToCLI, download.binaryName));
+            const downloadPath = yield tc.downloadTool(download.url);
+            let downloadExtractedFolder;
+            if (process.platform === 'win32') {
+                downloadExtractedFolder = yield tc.extractZip(downloadPath, pathToCLI);
+            }
+            else {
+                downloadExtractedFolder = yield tc.extractTar(downloadPath, pathToCLI);
+            }
             // Make the downloaded file executable
-            fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
+            fs.chmodSync(path.join(pathToCLI, "conftest"), '755');
             // Expose the tool by adding it to the PATH
             core.addPath(pathToCLI);
         }
