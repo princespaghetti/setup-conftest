@@ -107,7 +107,6 @@ function setup() {
     });
 }
 if (require.main === require.cache[eval('__filename')]) {
-    // eslint-disable-next-line no-void
     void setup();
 }
 

@@ -58,6 +58,5 @@ async function setup(): Promise<void> {
 }
 
 if (require.main === module) {
-  // eslint-disable-next-line no-void
   void setup();
 }
