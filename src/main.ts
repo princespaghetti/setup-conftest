@@ -1,5 +1,9 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github';
+import * as io from '@actions/io';
+import * as tc from '@actions/tool-cache';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as os from 'os';
 import * as semver from 'semver';
 
@@ -14,24 +18,24 @@ function mapArch(arch: string): string {
 
 // os in [darwin, linux, win32...] (https://nodejs.org/api/os.html#os_os_platform)
 // return value in [darwin, linux, windows]
-function mapOS(os: string): string {
+function mapOS(opsys: string): string {
   const mappings: { [s: string]: string } = {
     win32: 'windows',
   };
-  return mappings[os] || os;
+  return mappings[opsys] || opsys;
 }
 
 function getDownloadObject(version: string): {
   url: string;
   binaryName: string;
 } {
-  let vsn = `v${version}`;
+  const vsn = `v${version}`;
 
   const platform = os.platform();
   const filename = `opa_${mapOS(platform)}_${mapArch(os.arch())}`;
   const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
 
-  let url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
+  const url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
 
   return {
     url,
@@ -91,6 +95,11 @@ async function setup(): Promise<void> {
     core.info(`Setup Conftest version ${version}`);
     // Download the specific version of the tool, e.g. as a tarball/zipball
     const download = getDownloadObject(version);
+    const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
+    await tc.downloadTool(
+      download.url,
+      path.join(pathToCLI, download.binaryName)
+    );
 
   } catch (e) {
     core.setFailed(e as string | Error);
