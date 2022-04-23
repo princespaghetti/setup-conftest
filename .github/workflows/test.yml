@@ -21,7 +21,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./
         with:
-          milliseconds: 1000
-          version: v0.31.0
-      - name: Echo Version
-        run: echo $INPUT_VERSION
+          version: 0.31.0
+      - name: Conftest Version
+        run: conftest --version
