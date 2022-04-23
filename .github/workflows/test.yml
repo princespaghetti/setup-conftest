@@ -22,3 +22,5 @@ jobs:
       - uses: ./
         with:
           version: v0.31.0
+      - name: Conftest Version
+        run: conftest --version

@@ -1,11 +1,11 @@
-import * as core from '@actions/core'
-import * as github from '@actions/github';
-import * as io from '@actions/io';
-import * as tc from '@actions/tool-cache';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as semver from 'semver';
+import * as core from '@actions/core'
+import * as github from '@actions/github';
+import * as io from '@actions/io';
+import * as tc from '@actions/tool-cache';
 
 // arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
 // return value in [amd64, 386, arm]
@@ -42,7 +42,6 @@ function getDownloadObject(version: string): {
     binaryName,
   };
 }
-
 
 
 async function getVersion(): Promise<string> {
@@ -100,6 +99,12 @@ async function setup(): Promise<void> {
       download.url,
       path.join(pathToCLI, download.binaryName)
     );
+
+    // Make the downloaded file executable
+    fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
+
+    // Expose the tool by adding it to the PATH
+    core.addPath(pathToCLI);
 
   } catch (e) {
     core.setFailed(e as string | Error);

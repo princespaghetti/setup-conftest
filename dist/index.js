@@ -42,13 +42,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const tc = __importStar(__nccwpck_require__(7784));
 const fs = __importStar(__nccwpck_require__(5747));
 const path = __importStar(__nccwpck_require__(5622));
 const os = __importStar(__nccwpck_require__(2087));
 const semver = __importStar(__nccwpck_require__(1383));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const tc = __importStar(__nccwpck_require__(7784));
 // arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
 // return value in [amd64, 386, arm]
 function mapArch(arch) {
@@ -134,6 +134,10 @@ function setup() {
             const download = getDownloadObject(version);
             const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
             yield tc.downloadTool(download.url, path.join(pathToCLI, download.binaryName));
+            // Make the downloaded file executable
+            fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
+            // Expose the tool by adding it to the PATH
+            core.addPath(pathToCLI);
         }
         catch (e) {
             core.setFailed(e);
@@ -8305,7 +8309,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var Stream = _interopDefault(__nccwpck_require__(2413));
 var http = _interopDefault(__nccwpck_require__(8605));
 var Url = _interopDefault(__nccwpck_require__(8835));
-var whatwgUrl = _interopDefault(__nccwpck_require__(3323));
+var whatwgUrl = _interopDefault(__nccwpck_require__(629));
 var https = _interopDefault(__nccwpck_require__(7211));
 var zlib = _interopDefault(__nccwpck_require__(8761));
 
@@ -10807,7 +10811,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 3323:
+/***/ 629:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -13523,7 +13527,7 @@ module.exports = patch
 
 /***/ }),
 
-/***/ 6014:
+/***/ 4016:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const parse = __nccwpck_require__(5925)
@@ -13536,7 +13540,7 @@ module.exports = prerelease
 
 /***/ }),
 
-/***/ 7499:
+/***/ 6417:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const compare = __nccwpck_require__(4309)
@@ -13617,9 +13621,9 @@ module.exports = {
   major: __nccwpck_require__(6688),
   minor: __nccwpck_require__(8447),
   patch: __nccwpck_require__(2866),
-  prerelease: __nccwpck_require__(6014),
+  prerelease: __nccwpck_require__(4016),
   compare: __nccwpck_require__(4309),
-  rcompare: __nccwpck_require__(7499),
+  rcompare: __nccwpck_require__(6417),
   compareLoose: __nccwpck_require__(2804),
   compareBuild: __nccwpck_require__(2156),
   sort: __nccwpck_require__(1426),
@@ -13642,7 +13646,7 @@ module.exports = {
   validRange: __nccwpck_require__(2098),
   outside: __nccwpck_require__(420),
   gtr: __nccwpck_require__(9380),
-  ltr: __nccwpck_require__(8726),
+  ltr: __nccwpck_require__(3323),
   intersects: __nccwpck_require__(7008),
   simplifyRange: __nccwpck_require__(5297),
   subset: __nccwpck_require__(7863),
@@ -13953,7 +13957,7 @@ module.exports = intersects
 
 /***/ }),
 
-/***/ 8726:
+/***/ 3323:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const outside = __nccwpck_require__(420)
@@ -14535,7 +14539,7 @@ module.exports = __nccwpck_require__(4219);
 
 
 var net = __nccwpck_require__(1631);
-var tls = __nccwpck_require__(4016);
+var tls = __nccwpck_require__(8818);
 var http = __nccwpck_require__(8605);
 var https = __nccwpck_require__(7211);
 var events = __nccwpck_require__(8614);
@@ -14865,7 +14869,7 @@ module.exports = bytesToUuid;
 // Unique ID creation requires a high quality random # generator.  In node.js
 // this is pretty straight-forward - we use the crypto API.
 
-var crypto = __nccwpck_require__(6417);
+var crypto = __nccwpck_require__(3373);
 
 module.exports = function nodeRNG() {
   return crypto.randomBytes(16);
@@ -15432,7 +15436,7 @@ module.exports = require("child_process");
 
 /***/ }),
 
-/***/ 6417:
+/***/ 3373:
 /***/ ((module) => {
 
 "use strict";
@@ -15528,7 +15532,7 @@ module.exports = require("timers");
 
 /***/ }),
 
-/***/ 4016:
+/***/ 8818:
 /***/ ((module) => {
 
 "use strict";
