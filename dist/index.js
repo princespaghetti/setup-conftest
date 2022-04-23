@@ -69,21 +69,16 @@ function getDownloadObject(version) {
     const vsn = `v${version}`;
     const platform = os.platform();
     const filename = `conftest_${version}_${mapOS(platform)}_${mapArch(os.arch())}`;
-    const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
-    let releaseName;
     let url;
     if (process.platform === 'win32') {
-        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.zip`;
-        releaseName = `${binaryName}.zip`;
+        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.zip`;
     }
     else {
-        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.tar.gz`;
-        releaseName = releaseName = `${binaryName}.tar.gz`;
+        url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.tar.gz`;
     }
     core.info(`Fetch url: ${url}`);
     return {
-        url,
-        releaseName,
+        url
     };
 }
 function getVersion() {
