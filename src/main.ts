@@ -10,7 +10,7 @@ import * as tc from '@actions/tool-cache';
 // return value in [amd64, 386, arm]
 function mapArch(arch: string): string {
   const mappings: { [s: string]: string } = {
-    x64: 'amd64',
+    x64: 'x86_64',
   };
   return mappings[arch] || arch;
 }
