@@ -31,7 +31,7 @@ function getDownloadObject(version: string): {
   const vsn = `v${version}`;
 
   const platform = os.platform();
-  const filename = `conftest_${mapOS(platform)}_${mapArch(os.arch())}`;
+  const filename = `conftest_${version}_${mapOS(platform)}_${mapArch(os.arch())}`;
   const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
 
   let releaseName: string; 
@@ -105,11 +105,10 @@ async function setup(): Promise<void> {
     const download = getDownloadObject(version);
     const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
     const downloadPath = await tc.downloadTool(download.url);
-    let downloadExtractedFolder: string;
     if (process.platform === 'win32') {
-      downloadExtractedFolder = await tc.extractZip(downloadPath, pathToCLI);
+      await tc.extractZip(downloadPath, pathToCLI);
     } else {
-      downloadExtractedFolder = await tc.extractTar(downloadPath, pathToCLI);
+      await tc.extractTar(downloadPath, pathToCLI);
     }
     // Make the downloaded file executable
     fs.chmodSync(path.join(pathToCLI, "conftest"), '755');

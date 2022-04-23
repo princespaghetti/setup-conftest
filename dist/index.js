@@ -68,7 +68,7 @@ function mapOS(opsys) {
 function getDownloadObject(version) {
     const vsn = `v${version}`;
     const platform = os.platform();
-    const filename = `conftest_${mapOS(platform)}_${mapArch(os.arch())}`;
+    const filename = `conftest_${version}_${mapOS(platform)}_${mapArch(os.arch())}`;
     const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
     let releaseName;
     let url;
@@ -144,12 +144,11 @@ function setup() {
             const download = getDownloadObject(version);
             const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
             const downloadPath = yield tc.downloadTool(download.url);
-            let downloadExtractedFolder;
             if (process.platform === 'win32') {
-                downloadExtractedFolder = yield tc.extractZip(downloadPath, pathToCLI);
+                yield tc.extractZip(downloadPath, pathToCLI);
             }
             else {
-                downloadExtractedFolder = yield tc.extractTar(downloadPath, pathToCLI);
+                yield tc.extractTar(downloadPath, pathToCLI);
             }
             // Make the downloaded file executable
             fs.chmodSync(path.join(pathToCLI, "conftest"), '755');
