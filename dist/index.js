@@ -44,7 +44,35 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const os = __importStar(__nccwpck_require__(2087));
 const semver = __importStar(__nccwpck_require__(1383));
+// arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
+// return value in [amd64, 386, arm]
+function mapArch(arch) {
+    const mappings = {
+        x64: 'amd64',
+    };
+    return mappings[arch] || arch;
+}
+// os in [darwin, linux, win32...] (https://nodejs.org/api/os.html#os_os_platform)
+// return value in [darwin, linux, windows]
+function mapOS(os) {
+    const mappings = {
+        win32: 'windows',
+    };
+    return mappings[os] || os;
+}
+function getDownloadObject(version) {
+    let vsn = `v${version}`;
+    const platform = os.platform();
+    const filename = `opa_${mapOS(platform)}_${mapArch(os.arch())}`;
+    const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
+    let url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
+    return {
+        url,
+        binaryName,
+    };
+}
 function getVersion() {
     return __awaiter(this, void 0, void 0, function* () {
         const version = core.getInput('version');
@@ -100,6 +128,7 @@ function setup() {
             const version = yield getVersion();
             core.info(`Setup Conftest version ${version}`);
             // Download the specific version of the tool, e.g. as a tarball/zipball
+            const download = getDownloadObject(version);
         }
         catch (e) {
             core.setFailed(e);
