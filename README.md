@@ -7,7 +7,7 @@ Conftest is a utility to help you write tests against structured configuration d
 
 ## Basic Usage
 
-Here we see a simple template that checks out the repository code, installs conftest, and then runs a test against a yaml file. 
+Here we see a simple template that checks out the repository code, installs Conftest, and then runs a test against a yaml file. 
 
 ```yml
 name: Run Conftest Validation  
