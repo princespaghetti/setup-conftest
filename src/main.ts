@@ -1,10 +1,9 @@
+import * as core from '@actions/core'
 import * as fs from 'fs';
+import * as github from '@actions/github';
 import * as path from 'path';
 import * as os from 'os';
 import * as semver from 'semver';
-import * as core from '@actions/core'
-import * as github from '@actions/github';
-import * as io from '@actions/io';
 import * as tc from '@actions/tool-cache';
 
 // arch in [arm, x32, x64...] (https://nodejs.org/api/os.html#os_os_arch)
@@ -36,7 +35,7 @@ function getDownloadObject(version: string): {
   const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
 
   const url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}`;
-
+  core.info(`Fetch url: ${url}`);
   return {
     url,
     binaryName,
