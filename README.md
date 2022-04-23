@@ -80,6 +80,6 @@ This action does not set any direct outputs.
 ## Credits
 
 Thanks to the fine folks over at [Infracost](https://github.com/infracost/infracost) who created the initial version of [setup-opa](https://github.com/open-policy-agent/setup-opa) and the OPA team for their continued support of the action. 
-This repository re-uses a large amount of the functionality with modifications for how conftest is distributed.
+This repository re-uses a large amount of the functionality with modifications for how Conftest is distributed.
 
 The [typescript action template](https://github.com/actions/typescript-action) also helpful to rapidly create this action.

@@ -1,4 +1,4 @@
-name: "Setup Conftest"
+name: "Setup OPA Conftest"
 description: 'Install the Conftest binary for use during a workflow'
 author: 'princespaghetti'
 inputs:
