@@ -26,29 +26,29 @@ function mapOS(opsys: string): string {
 
 function getDownloadObject(version: string): {
   url: string;
-  releaseName: string;
+  binaryName: string;
 } {
   const vsn = `v${version}`;
 
   const platform = os.platform();
   const filename = `conftest_${version}_${mapOS(platform)}_${mapArch(os.arch())}`;
-  const binaryName = platform === 'win32' ? `${filename}.exe` : filename;
 
-  let releaseName: string; 
+
   let url: string;
+  let binaryName: string;
 
   if (process.platform === 'win32') {
-    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.zip`;
-    releaseName = `${binaryName}.zip`;
+    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.zip`;
+    binaryName = `conftest.exe`
   } else {
-    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${binaryName}.tar.gz`;
-    releaseName = releaseName = `${binaryName}.tar.gz`;
+    url = `https://github.com/open-policy-agent/conftest/releases/download/${vsn}/${filename}.tar.gz`;
+    binaryName = `conftest`
   }
 
   core.info(`Fetch url: ${url}`);
   return {
     url,
-    releaseName,
+    binaryName
   };
 }
 
@@ -111,7 +111,7 @@ async function setup(): Promise<void> {
       await tc.extractTar(downloadPath, pathToCLI);
     }
     // Make the downloaded file executable
-    fs.chmodSync(path.join(pathToCLI, "conftest"), '755');
+    fs.chmodSync(path.join(pathToCLI,download.binaryName), '755');
 
     // Expose the tool by adding it to the PATH
     core.addPath(pathToCLI);
