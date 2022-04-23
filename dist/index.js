@@ -146,7 +146,8 @@ function setup() {
                 yield tc.extractTar(downloadPath, pathToCLI);
             }
             // Make the downloaded file executable
-            fs.chmodSync(path.join(pathToCLI, "conftest"), '755');
+            const binaryName = os.platform() === 'win32' ? `conftest.exe` : `conftest`;
+            fs.chmodSync(path.join(pathToCLI, binaryName), '755');
             // Expose the tool by adding it to the PATH
             core.addPath(pathToCLI);
         }
