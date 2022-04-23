@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import * as semver from 'semver';
 import * as github from '@actions/github';
+import * as semver from 'semver';
 
 
 async function getVersion(): Promise<string> {

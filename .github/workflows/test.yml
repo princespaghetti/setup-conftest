@@ -24,4 +24,4 @@ jobs:
           milliseconds: 1000
           version: v0.31.0
       - name: Echo Version
-        run: echo ${{ inputs.version }}
+        run: echo $INPUT_VERSION
