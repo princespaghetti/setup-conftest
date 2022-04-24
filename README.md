@@ -21,8 +21,6 @@ jobs:
 
     - name: Setup Conftest
       uses: princespaghetti/setup-conftest@v1
-      with:
-        version: 0.31.0
 
     - name: Run Conftest 
       run: conftest test file.yaml
@@ -71,7 +69,7 @@ steps:
 
 The action supports the following inputs:
 
-- `version`: Optional, defaults to 0.31.0 and [SemVer ranges](https://www.npmjs.com/package/semver#ranges) are supported, so instead of a full version string, you can use `0.29` or `0.31` as the version.
+- `version`: Optional, defaults to `latest` and [SemVer ranges](https://www.npmjs.com/package/semver#ranges) are supported, so instead of a full version string, you can use `0.29` or `0.31` as the version.
 
 ## Outputs
 

@@ -5,7 +5,7 @@ inputs:
   version:
     description: Version of Conftest to install. Semver Ranges (https://www.npmjs.com/package/semver#ranges) are supported.
     required: false
-    default: 0.31.0
+    default: latest
   github-token:
     description: 'The GitHub access token (e.g. secrets.GITHUB_TOKEN) used to get the list of Conftest versions. This defaults to {{ github.token }}.'
     default: '${{ github.token }}'

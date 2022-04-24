@@ -88,14 +88,16 @@ function getDownloadObject(version) {
 function getVersion() {
     return __awaiter(this, void 0, void 0, function* () {
         const version = core.getInput('version');
-        if (version === 'latest' || version === 'edge') {
-            return version;
+        const versions = yield getAllVersions();
+        if (version === 'latest') {
+            //Lastest versions is front, remove leading v in preparation for getDownloadObject
+            return versions[0].substring(1);
         }
         if (semver.valid(version)) {
             return semver.clean(version) || version;
         }
         if (semver.validRange(version)) {
-            const max = semver.maxSatisfying(yield getAllVersions(), version);
+            const max = semver.maxSatisfying(versions, version);
             if (max) {
                 return semver.clean(max) || version;
             }

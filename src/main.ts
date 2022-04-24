@@ -55,8 +55,10 @@ function getDownloadObject(version: string): {
 
 async function getVersion(): Promise<string> {
   const version = core.getInput('version');
-  if (version === 'latest' || version === 'edge') {
-    return version;
+  const versions = await getAllVersions()
+  if (version === 'latest') {
+    //Lastest versions is front, remove leading v in preparation for getDownloadObject
+    return versions[0].substring(1);
   }
 
   if (semver.valid(version)) {
@@ -64,7 +66,7 @@ async function getVersion(): Promise<string> {
   }
 
   if (semver.validRange(version)) {
-    const max = semver.maxSatisfying(await getAllVersions(), version);
+    const max = semver.maxSatisfying(versions, version);
     if (max) {
       return semver.clean(max) || version;
     }
