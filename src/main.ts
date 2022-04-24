@@ -57,7 +57,7 @@ async function getVersion(): Promise<string> {
   const version = core.getInput('version');
   const versions = await getAllVersions()
   if (version === 'latest') {
-    return versions[versions.length-1];
+    return versions[0];
   }
 
   if (semver.valid(version)) {
