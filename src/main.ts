@@ -57,7 +57,8 @@ async function getVersion(): Promise<string> {
   const version = core.getInput('version');
   const versions = await getAllVersions()
   if (version === 'latest') {
-    return versions[0];
+    //Lastest versions is front, remove leading v in preparation for getDownloadObject
+    return versions[0].substring(1);
   }
 
   if (semver.valid(version)) {
