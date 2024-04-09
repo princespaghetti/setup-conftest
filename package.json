@@ -29,11 +29,11 @@
     "@actions/github": "^6.0.0",
     "@actions/io": "^1.1.2",
     "@actions/tool-cache": "^2.0.1",
-    "semver": "^7.5.0"
+    "semver": "^7.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.2",
-    "@types/semver": "^7.5.0",
+    "@types/semver": "^7.5.8",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "@vercel/ncc": "^0.38.0",
