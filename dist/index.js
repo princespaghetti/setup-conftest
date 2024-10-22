@@ -114,25 +114,20 @@ function getVersion() {
     });
 }
 function getAllVersions() {
-    var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, e_1, _b, _c;
         const githubToken = core.getInput('github-token', { required: true });
         const octokit = github.getOctokit(githubToken);
         const allVersions = [];
         try {
-            for (var _d = true, _e = __asyncValues(octokit.paginate.iterator(octokit.rest.repos.listReleases, { owner: 'open-policy-agent', repo: 'conftest' })), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
+            for (var _d = true, _e = __asyncValues(octokit.paginate.iterator(octokit.rest.repos.listReleases, { owner: 'open-policy-agent', repo: 'conftest' })), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
                 _c = _f.value;
                 _d = false;
-                try {
-                    const response = _c;
-                    for (const release of response.data) {
-                        if (release.name) {
-                            allVersions.push(release.name);
-                        }
+                const response = _c;
+                for (const release of response.data) {
+                    if (release.name) {
+                        allVersions.push(release.name);
                     }
-                }
-                finally {
-                    _d = true;
                 }
             }
         }
