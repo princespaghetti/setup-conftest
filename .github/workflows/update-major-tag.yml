@@ -1,0 +1,39 @@
+# Automatically update major version tag (e.g., v1) to point to the latest release
+# Based on GitHub Actions best practices: https://github.com/actions/toolkit/blob/main/docs/action-versioning.md
+
+name: Update Major Version Tag
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-major-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update major version tag
+        run: |
+          # Extract version from the release tag (e.g., v1.1.23 -> v1)
+          VERSION=${GITHUB_REF#refs/tags/}
+          MAJOR=${VERSION%%.*}
+
+          echo "Release version: $VERSION"
+          echo "Major version tag: $MAJOR"
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Move the major version tag to the current release
+          git tag -fa "$MAJOR" -m "Update $MAJOR tag to $VERSION"
+          git push origin "$MAJOR" --force
+
+          echo "Successfully updated $MAJOR tag to point to $VERSION"
