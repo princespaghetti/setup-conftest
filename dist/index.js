@@ -67,7 +67,7 @@ const tc = __importStar(__nccwpck_require__(7784));
 // return value in [amd64, 386, arm]
 function mapArch(arch) {
     const mappings = {
-        x64: 'x86_64',
+        x64: 'x86_64'
     };
     return mappings[arch] || arch;
 }
@@ -75,7 +75,7 @@ function mapArch(arch) {
 // return value in [darwin, linux, windows]
 function mapOS(opsys) {
     const mappings = {
-        win32: 'windows',
+        win32: 'windows'
     };
     return mappings[opsys] || opsys;
 }
