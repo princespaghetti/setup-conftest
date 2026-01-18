@@ -39,22 +39,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(7147));
@@ -99,83 +83,64 @@ function getDownloadObject(version) {
         binaryName
     };
 }
-function getVersion() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const version = core.getInput('version');
-        const versions = yield getAllVersions();
-        if (version === 'latest') {
-            //Lastest versions is front, remove leading v in preparation for getDownloadObject
-            return versions[0].substring(1);
+async function getVersion() {
+    const version = core.getInput('version');
+    const versions = await getAllVersions();
+    if (version === 'latest') {
+        //Lastest versions is front, remove leading v in preparation for getDownloadObject
+        return versions[0].substring(1);
+    }
+    if (semver.valid(version)) {
+        return semver.clean(version) || version;
+    }
+    if (semver.validRange(version)) {
+        const max = semver.maxSatisfying(versions, version);
+        if (max) {
+            return semver.clean(max) || version;
         }
-        if (semver.valid(version)) {
-            return semver.clean(version) || version;
-        }
-        if (semver.validRange(version)) {
-            const max = semver.maxSatisfying(versions, version);
-            if (max) {
-                return semver.clean(max) || version;
+        core.warning(`${version} did not match any release version.`);
+    }
+    else {
+        core.warning(`${version} is not a valid version or range.`);
+    }
+    return version;
+}
+async function getAllVersions() {
+    const githubToken = core.getInput('github-token', { required: true });
+    const octokit = github.getOctokit(githubToken);
+    const allVersions = [];
+    for await (const response of octokit.paginate.iterator(octokit.rest.repos.listReleases, { owner: 'open-policy-agent', repo: 'conftest' })) {
+        for (const release of response.data) {
+            if (release.name) {
+                allVersions.push(release.name);
             }
-            core.warning(`${version} did not match any release version.`);
+        }
+    }
+    return allVersions;
+}
+async function setup() {
+    try {
+        // Get version of tool to be installed
+        const version = await getVersion();
+        core.info(`Setup Conftest version ${version}`);
+        // Download the specific version of the tool, e.g. as a tarball/zipball
+        const download = getDownloadObject(version);
+        const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
+        const downloadPath = await tc.downloadTool(download.url);
+        if (process.platform === 'win32') {
+            await tc.extractZip(downloadPath, pathToCLI);
         }
         else {
-            core.warning(`${version} is not a valid version or range.`);
+            await tc.extractTar(downloadPath, pathToCLI);
         }
-        return version;
-    });
-}
-function getAllVersions() {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, e_1, _b, _c;
-        const githubToken = core.getInput('github-token', { required: true });
-        const octokit = github.getOctokit(githubToken);
-        const allVersions = [];
-        try {
-            for (var _d = true, _e = __asyncValues(octokit.paginate.iterator(octokit.rest.repos.listReleases, { owner: 'open-policy-agent', repo: 'conftest' })), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
-                _c = _f.value;
-                _d = false;
-                const response = _c;
-                for (const release of response.data) {
-                    if (release.name) {
-                        allVersions.push(release.name);
-                    }
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return allVersions;
-    });
-}
-function setup() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            // Get version of tool to be installed
-            const version = yield getVersion();
-            core.info(`Setup Conftest version ${version}`);
-            // Download the specific version of the tool, e.g. as a tarball/zipball
-            const download = getDownloadObject(version);
-            const pathToCLI = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
-            const downloadPath = yield tc.downloadTool(download.url);
-            if (process.platform === 'win32') {
-                yield tc.extractZip(downloadPath, pathToCLI);
-            }
-            else {
-                yield tc.extractTar(downloadPath, pathToCLI);
-            }
-            // Make the downloaded file executable
-            fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
-            // Expose the tool by adding it to the PATH
-            core.addPath(pathToCLI);
-        }
-        catch (e) {
-            core.setFailed(e);
-        }
-    });
+        // Make the downloaded file executable
+        fs.chmodSync(path.join(pathToCLI, download.binaryName), '755');
+        // Expose the tool by adding it to the PATH
+        core.addPath(pathToCLI);
+    }
+    catch (e) {
+        core.setFailed(e);
+    }
 }
 if (require.main === require.cache[eval('__filename')]) {
     void setup();
