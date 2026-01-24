@@ -1,15 +1,15 @@
 name: "Setup OPA Conftest"
-description: 'Install the Conftest binary for use during a workflow'
-author: 'princespaghetti'
+description: "Install the Conftest binary for use during a workflow"
+author: "princespaghetti"
 inputs:
   version:
     description: Version of Conftest to install. Semver Ranges (https://www.npmjs.com/package/semver#ranges) are supported.
     required: false
     default: latest
   github-token:
-    description: 'The GitHub access token (e.g. secrets.GITHUB_TOKEN) used to get the list of Conftest versions. This defaults to {{ github.token }}.'
-    default: '${{ github.token }}'
+    description: "The GitHub access token (e.g. secrets.GITHUB_TOKEN) used to get the list of Conftest versions. This defaults to {{ github.token }}."
+    default: "${{ github.token }}"
     required: false
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"
