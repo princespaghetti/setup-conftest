@@ -118,6 +118,4 @@ async function setup(): Promise<void> {
   }
 }
 
-if (require.main === module) {
-  void setup();
-}
+void setup();
