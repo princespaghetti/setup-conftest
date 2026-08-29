@@ -37,7 +37,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^26.2.0",
     "@types/semver": "^7.7.1",
-    "eslint": "^10.8.0",
+    "eslint": "^10.9.1",
     "prettier": "3.9.4",
     "rollup": "^4.63.0",
     "tslib": "^2.8.1",
